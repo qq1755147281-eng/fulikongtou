@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#140825">
+<title>福利领取</title>
+<style>
+:root{
+  --bg:#140825;
+  --red:#ff2d55;
+  --red-deep:#c8103e;
+  --purple:#8b5cf6;
+  --purple-deep:#5b21b6;
+  --gold:#ffd45e;
+  --ink:#f3ecff;
+  --ink-dim:#b9a6dd;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(120% 50% at 50% -6%, rgba(255,45,85,.34), transparent 60%),
+    radial-gradient(90% 42% at 108% 20%, rgba(139,92,246,.28), transparent 60%),
+    radial-gradient(90% 42% at -8% 38%, rgba(200,16,62,.20), transparent 60%),
+    linear-gradient(180deg,#1b0b31 0%, #140825 46%, #0f051d 100%);
+  min-height:100dvh;
+  overflow-x:hidden;
+}
+/* 颗粒质感 */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.06;z-index:5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+}
+/* 漂浮光斑 */
+.orb{position:fixed;border-radius:50%;filter:blur(75px);pointer-events:none;z-index:0}
+.orb-r{width:220px;height:220px;left:-70px;top:7%;background:rgba(255,45,85,.32);animation:drift 9s ease-in-out infinite alternate}
+.orb-p{width:250px;height:250px;right:-90px;top:30%;background:rgba(124,58,237,.34);animation:drift 11s ease-in-out infinite alternate-reverse}
+@keyframes drift{from{transform:translateY(-16px)}to{transform:translateY(22px)}}
+
+.page{
+  position:relative;z-index:1;
+  max-width:430px;margin:0 auto;
+  min-height:100dvh;
+  padding:calc(env(safe-area-inset-top) + 12px) 20px 36px; /* 顶部更靠上 */
+  display:flex;flex-direction:column;gap:14px;
+}
+
+/* ============ 顶部标题区（楷体，靠顶） ============ */
+.hero{text-align:center;animation:rise .7s .05s both}
+.hero .eyebrow{
+  display:inline-block;font-size:9px;letter-spacing:5px;
+  color:var(--ink-dim);text-transform:uppercase;margin-bottom:5px;
+}
+.hero h1{
+  font-family:"KaiTi","STKaiti","楷体",serif;
+  font-size:44px;font-weight:700;letter-spacing:8px;line-height:1.12;
+  background:linear-gradient(180deg,#fff3c9 0%,#ffc24b 42%,#ff4d6d 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 14px rgba(255,60,100,.42)) drop-shadow(0 3px 8px rgba(0,0,0,.5));
+}
+.hero .sub{
+  margin-top:8px;display:inline-flex;align-items:center;gap:7px;
+  padding:6px 16px;border-radius:999px;
+  font-size:12.5px;letter-spacing:1.5px;color:#ffe3ea;
+  background:linear-gradient(135deg,rgba(255,45,85,.18),rgba(139,92,246,.18));
+  border:1px solid rgba(255,120,150,.40);
+  box-shadow:0 0 14px rgba(255,45,85,.22), inset 0 0 10px rgba(255,45,85,.08);
+}
+.hero .sub svg{width:13px;height:13px;color:var(--gold);filter:drop-shadow(0 0 5px rgba(255,212,94,.8))}
+
+/* ============ 单张红底长方形图片（内含标题与三条规则） ============ */
+.banner{
+  position:relative;border-radius:12px;overflow:hidden;
+  width:100%;
+  border:1px solid rgba(255,150,110,.34);
+  box-shadow:0 10px 26px rgba(0,0,0,.42), 0 0 22px rgba(255,90,50,.26);
+  background:
+    radial-gradient(90% 130% at 18% 0%, rgba(255,205,150,.38), transparent 58%),
+    linear-gradient(135deg,#ff4d6d 0%,#e6214b 42%,#f0710f 78%,#ff9c2e 100%);
+  display:flex;flex-direction:column;justify-content:center;gap:4px;
+  padding:9px 16px;
+  animation:rise .7s .15s both;
+}
+.b-title{
+  font-family:"KaiTi","STKaiti","楷体",serif;
+  font-size:19px;font-weight:700;letter-spacing:4px;color:#fff7e8;
+  text-shadow:0 2px 8px rgba(90,0,20,.6), 0 0 14px rgba(255,210,120,.45);
+}
+.b-line{width:100%;height:1px;background:linear-gradient(90deg,rgba(255,235,180,.85),transparent)}
+
+/* 三条规则 */
+.b-rule{display:flex;align-items:flex-start;gap:7px}
+.b-num{
+  flex:none;width:17px;height:17px;border-radius:50%;margin-top:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10.5px;font-weight:700;color:#fff;
+  background:rgba(70,0,20,.42);border:1px solid rgba(255,225,200,.55);
+}
+.b-txt{
+  font-family:"KaiTi","STKaiti","楷体",serif;
+  font-size:13px;line-height:1.35;letter-spacing:.5px;color:#fff2f5;
+  text-shadow:0 1px 4px rgba(90,15,0,.45);
+}
+.b-txt em{font-style:normal;color:#ffe08a;font-weight:700}
+
+/* ============ 公告栏（红色喇叭按钮 + 精细化滚动栏） ============ */
+.notice{
+  display:flex;align-items:center;gap:6px;
+  height:25px;box-sizing:border-box;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.55);
+  border-radius:8px;padding:1px 6px;
+  backdrop-filter:blur(8px);
+  animation:rise .7s .25s both;
+}
+.notice .horn{ /* 红色喇叭按钮 */
+  flex:none;display:flex;align-items:center;justify-content:center;
+  width:18px;height:18px;border-radius:5px;
+  color:#fff;background:linear-gradient(135deg,#ff4d6d,var(--red-deep));
+  box-shadow:0 3px 10px rgba(255,45,85,.38), inset 0 0 6px rgba(255,255,255,.18);
+  position:relative;
+}
+.notice .horn::after{ /* 呼吸光圈 */
+  content:"";position:absolute;inset:-2px;border-radius:7px;
+  border:1px solid rgba(255,255,255,.5);animation:pulse 2.4s ease-in-out infinite;
+}
+.notice .horn svg{width:10px;height:10px}
+@keyframes pulse{
+  0%,100%{opacity:.9;transform:scale(1)}
+  50%{opacity:.25;transform:scale(1.12)}
+}
+/* 滚动字幕区：无边框、无两端遮罩 */
+.marquee{flex:1;overflow:hidden;border:0}
+.marquee-inner{display:inline-flex;white-space:nowrap;border:0;animation:mar 20s linear infinite}
+.mq-item{display:inline-flex;align-items:center;font-size:13px;line-height:1;letter-spacing:1.2px;border:0;color:#e9e0fa;text-shadow:0 0 13px rgba(255,45,85,.45);font-weight:600}
+.mq-item .sep{
+  width:4px;height:4px;margin:0 13px;transform:rotate(45deg);
+  background:linear-gradient(135deg,#ff7a92,#c8103e);
+  box-shadow:0 0 5px rgba(255,45,85,.6);
+}
+@keyframes mar{to{transform:translateX(-50%)}}
+
+/* ============ 双按钮（更小更精致） ============ */
+.actions{display:flex;gap:10px;margin-top:2px;animation:rise .7s .35s both}
+.btn{
+  flex:1;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  height:46px;border-radius:11px;
+  font-family:inherit;font-size:14px;font-weight:600;letter-spacing:2.5px;
+  cursor:pointer;transition:.2s ease;
+  color:#e8dcff;
+  border:1px solid rgba(255,255,255,.55);
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),rgba(20,8,37,.6);
+  backdrop-filter:blur(6px);
+  box-shadow:inset 0 0 10px rgba(255,255,255,.06);
+}
+.btn svg{width:15px;height:15px;flex:none}
+.btn::before{ /* 顶部高光细线 */
+  content:"";position:absolute;left:10%;right:10%;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
+  pointer-events:none;
+}
+/* 选中态：红色发光线条 */
+.btn.on{
+  color:#ffdce4;
+  border:1px solid rgba(255,95,126,.85);
+  box-shadow:0 0 18px rgba(255,45,85,.5), inset 0 0 14px rgba(255,45,85,.18);
+  text-shadow:0 0 10px rgba(255,45,85,.7);
+}
+.btn:active{transform:scale(.955)}
+
+/* ============ 生态卡片（长方形 · 精简版 · 橙金科技线条） ============ */
+.panel{display:none;flex-direction:column;gap:10px;animation:rise .5s both}
+.panel.on{display:flex}
+.card{
+  position:relative;overflow:hidden;
+  background:
+    linear-gradient(135deg,rgba(255,170,60,.07),transparent 45%),
+    linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.01)),rgba(24,10,40,.7);
+  border:1px solid rgba(255,175,60,.55);
+  border-radius:12px;padding:14px 16px;
+  backdrop-filter:blur(6px);
+  box-shadow:0 0 16px rgba(255,140,30,.16), inset 0 0 16px rgba(255,140,30,.06);
+  cursor:pointer;transition:.18s;
+}
+.card:active{transform:scale(.985)}
+.card::before{ /* 左侧橙金科技细线 */
+  content:"";position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:2px;
+  background:linear-gradient(180deg,#ffd45e,#ff9a3c 55%,#ff4d6d);
+  box-shadow:0 0 10px rgba(255,150,40,.85);
+}
+.card::after{ /* 右上角科技折角 */
+  content:"";position:absolute;top:8px;right:8px;width:12px;height:12px;
+  border-top:2px solid rgba(255,190,90,.85);border-right:2px solid rgba(255,190,90,.85);
+  border-radius:0 3px 0 0;
+}
+.c-top{display:flex;align-items:center;gap:9px}
+.c-num{
+  font-family:"KaiTi","STKaiti","楷体",serif;
+  font-size:15px;font-weight:700;line-height:1;
+  background:linear-gradient(180deg,#fff6d0,#ffb040 55%,#ff5a3c);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 9px rgba(255,140,40,.6));
+}
+.c-name{
+  font-family:"KaiTi","STKaiti","楷体",serif;
+  font-size:15px;font-weight:700;letter-spacing:1.6px;color:#ffeacb;
+  text-shadow:0 0 11px rgba(255,160,50,.45);
+}
+.c-view{
+  margin-left:auto;flex:none;padding-right:14px;
+  font-size:11px;letter-spacing:.8px;color:#ffd07a;
+  text-shadow:0 0 9px rgba(255,160,50,.5);
+}
+.c-sub{
+  margin-top:5px;
+  font-family:"KaiTi","STKaiti","楷体",serif;
+  font-size:12px;font-weight:600;letter-spacing:1px;
+  color:#ffbe5c;text-shadow:0 0 9px rgba(255,150,40,.45);
+}
+.c-desc{
+  margin-top:5px;
+  font-family:"KaiTi","STKaiti","楷体",serif;
+  font-size:12px;line-height:1.6;letter-spacing:.8px;color:#cfc2e8;
+}
+
+/* ---- 已过期的生态：灰白为主，呈现"已停止"的观感 ---- */
+.card.old{
+  border:1px solid rgba(255,255,255,.34);
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.05),transparent 45%),
+    linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01)),rgba(26,24,32,.72);
+  box-shadow:0 0 14px rgba(255,255,255,.08), inset 0 0 16px rgba(255,255,255,.04);
+}
+.card.old::before{
+  background:linear-gradient(180deg,#f2f2f2,#b9b9c4 55%,#8a8a97);
+  box-shadow:0 0 8px rgba(220,220,230,.5);
+}
+.card.old::after{
+  border-top-color:rgba(235,235,240,.7);border-right-color:rgba(235,235,240,.7);
+}
+.card.old .c-num{
+  background:linear-gradient(180deg,#ffffff,#c9c9d4 60%,#9a9aa8);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 8px rgba(230,230,240,.45));
+}
+.card.old .c-name{color:#e2e0ea;text-shadow:0 0 10px rgba(255,255,255,.28)}
+.card.old .c-view{color:#c9c6d6;text-shadow:none}
+.card.old .c-sub{color:#bdb9c9;text-shadow:none}
+.card.old .c-desc{color:#9d99ab}
+
+/* ============ 卡片详情弹窗（占屏 80%，手机竖屏） ============ */
+#modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center}
+#modal.show{display:flex}
+.mask{position:absolute;inset:0;background:rgba(8,4,16,.72);backdrop-filter:blur(9px)}
+.mbox{
+  position:relative;display:flex;flex-direction:column;
+  width:80vw;max-width:348px;height:80vh;max-height:640px;
+  padding:18px 15px 16px;border-radius:18px;overflow-y:auto;
+  background:
+    linear-gradient(150deg,rgba(255,170,60,.10),transparent 45%),
+    linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.01)),rgba(22,9,38,.93);
+  border:1px solid rgba(255,175,60,.75);
+  box-shadow:0 0 34px rgba(255,140,30,.35), inset 0 0 26px rgba(255,140,30,.08);
+  animation:pop .28s cubic-bezier(.2,1.1,.35,1) both;
+}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.94)}to{opacity:1;transform:none}}
+.m-close{
+  position:absolute;top:9px;right:10px;width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;line-height:1;cursor:pointer;
+  color:#ffd9a0;background:rgba(255,140,30,.14);
+  border:1px solid rgba(255,175,60,.5);
+}
+.m-close:active{transform:scale(.9)}
+.m-head{display:flex;align-items:center;gap:9px;padding-right:34px}
+.m-num{
+  font-family:"KaiTi","STKaiti","楷体",serif;font-size:16px;font-weight:700;line-height:1;
+  background:linear-gradient(180deg,#fff6d0,#ffb040 55%,#ff5a3c);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 9px rgba(255,140,40,.6));
+}
+.m-name{
+  font-family:"KaiTi","STKaiti","楷体",serif;font-size:16px;font-weight:700;
+  letter-spacing:1.8px;color:#ffeacb;text-shadow:0 0 12px rgba(255,160,50,.45);
+}
+.m-lines{margin-top:12px;padding:11px 12px;border-radius:10px;background:rgba(255,255,255,.035);border-left:3px solid rgba(255,175,60,.7)}
+.m-lines .ln{
+  font-family:"KaiTi","STKaiti","楷体",serif;
+  font-size:12.5px;line-height:1.8;letter-spacing:.8px;color:#d7cbec;
+}
+.m-lines .ln + .ln{margin-top:5px}
+.m-grid{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.m-item{
+  font-family:"KaiTi","STKaiti","楷体",serif;font-size:11.5px;line-height:1.5;
+  padding:9px 10px;border-radius:10px;color:#e9dcff;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),rgba(255,255,255,.03);
+  border:1px solid rgba(255,175,60,.45);
+  box-shadow:0 0 12px rgba(255,140,30,.14), inset 0 0 10px rgba(255,140,30,.05);
+}
+.m-item .k{color:#ffbe5c}
+.m-item .v{color:#fff4e2;font-weight:700}
+/* 已过期生态的弹窗：灰白线条 */
+.mbox.old{
+  border-color:rgba(255,255,255,.45);
+  box-shadow:0 0 30px rgba(255,255,255,.12), inset 0 0 26px rgba(255,255,255,.05);
+  background:
+    linear-gradient(150deg,rgba(255,255,255,.06),transparent 45%),
+    linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.01)),rgba(24,22,30,.93);
+}
+.mbox.old .m-close{color:#e6e4ee;background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.35)}
+.mbox.old .m-num{
+  background:linear-gradient(180deg,#ffffff,#c9c9d4 60%,#9a9aa8);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 8px rgba(230,230,240,.45));
+}
+.mbox.old .m-name{color:#e2e0ea;text-shadow:0 0 10px rgba(255,255,255,.28)}
+.mbox.old .m-lines{border-left-color:rgba(255,255,255,.4)}
+.mbox.old .m-lines .ln{color:#c8c4d4}
+.mbox.old .m-item{border-color:rgba(255,255,255,.3);box-shadow:0 0 10px rgba(255,255,255,.07)}
+.mbox.old .m-item .k{color:#bdb9c9}
+.mbox.old .m-item .v{color:#f2f0f8}
+
+/* ---- 领取步骤流程：绿色竖线连接 ---- */
+.steps{margin-top:13px;padding:12px 12px 10px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(60,220,130,.28)}
+.step{position:relative;display:flex;gap:10px;padding-bottom:11px}
+.step:last-child{padding-bottom:0}
+.step:not(:last-child)::after{ /* 绿色连接竖线 */
+  content:"";position:absolute;left:10px;top:23px;bottom:0;width:2px;
+  background:linear-gradient(180deg,rgba(60,220,130,.9),rgba(60,220,130,.45));
+  box-shadow:0 0 8px rgba(46,204,113,.6);
+}
+.step .dot{
+  flex:none;width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#eafff2;
+  background:rgba(46,204,113,.16);border:1px solid rgba(60,220,130,.8);
+  box-shadow:0 0 10px rgba(46,204,113,.5);
+}
+.stxt{
+  font-family:"KaiTi","STKaiti","楷体",serif;font-size:12.5px;line-height:1.5;
+  letter-spacing:.8px;color:#dff5e6;
+}
+.stxt em{
+  display:block;margin-top:2px;font-style:normal;
+  font-size:10.5px;line-height:1.5;letter-spacing:.4px;color:#8fa79a;
+}
+
+/* ---- 弹窗底部两个长方形按钮 ---- */
+.m-btns{margin-top:13px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.m-btn{
+  height:40px;border-radius:10px;cursor:pointer;transition:.16s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-family:"KaiTi","STKaiti","楷体",serif;
+  font-size:12.5px;font-weight:700;letter-spacing:1.6px;color:#ffe9cf;
+  background:linear-gradient(180deg,rgba(255,170,60,.20),rgba(255,170,60,.06)),rgba(255,255,255,.03);
+  border:1px solid rgba(255,175,60,.62);
+  box-shadow:0 0 15px rgba(255,140,30,.22), inset 0 0 12px rgba(255,140,30,.08);
+  text-shadow:0 0 10px rgba(255,160,50,.5);
+}
+.m-btn{overflow:hidden}
+.m-btn svg{width:14px;height:14px;flex:none}
+.m-btn:active{transform:scale(.97)}
+.mbox.old .m-btn{
+  color:#eceaf4;text-shadow:0 0 9px rgba(255,255,255,.3);
+  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03)),rgba(255,255,255,.03);
+  border-color:rgba(255,255,255,.36);
+  box-shadow:0 0 13px rgba(255,255,255,.10), inset 0 0 12px rgba(255,255,255,.05);
+}
+
+/* ---- 点击特效：水波扩散 + 亮度脉冲 ---- */
+.ripple{
+  position:absolute;border-radius:50%;pointer-events:none;
+  transform:scale(0);opacity:.5;
+  background:radial-gradient(circle,rgba(255,255,255,.8),rgba(255,255,255,0) 70%);
+  animation:rip .55s ease-out forwards;
+}
+@keyframes rip{to{transform:scale(1);opacity:0}}
+@keyframes tapFlash{0%{filter:brightness(1)}32%{filter:brightness(1.6)}100%{filter:brightness(1)}}
+.tapped{animation:tapFlash .4s ease-out}
+
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="orb orb-r"></div>
+<div class="orb orb-p"></div>
+
+<main class="page">
+
+  <!-- 顶部标题（楷体，更靠顶） -->
+  <header class="hero">
+    <span class="eyebrow">Welfare Center</span>
+    <h1>福利领取</h1>
+    <div class="sub">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+      全民免费领取福利 · 活动推出
+    </div>
+  </header>
+
+  <!-- 单张红底长方形图片：福利领取规则（含三条规则） -->
+  <section class="banner">
+    <div class="b-title">福利领取规则：公告</div>
+    <div class="b-line"></div>
+    <div class="b-rule">
+      <span class="b-num">1</span>
+      <span class="b-txt">活动期间，全民领取<em>福利</em></span>
+    </div>
+    <div class="b-rule">
+      <span class="b-num">2</span>
+      <span class="b-txt">投资有风险，<em>禁止一切投资行为、支付操作</em></span>
+    </div>
+    <div class="b-rule">
+      <span class="b-num">3</span>
+      <span class="b-txt">所有福利活动期限一过，<em>禁止参与，禁止贪心</em></span>
+    </div>
+  </section>
+
+  <!-- 公告栏：红色喇叭按钮 + 精细化滚动栏 -->
+  <section class="notice">
+    <span class="horn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10v4l4 1 10 4V5L7 9l-4 1z"/><path d="M19.5 9.5a3.5 3.5 0 0 1 0 5"/></svg>
+    </span>
+    <div class="marquee">
+      <div class="marquee-inner">
+        <span class="mq-item">点击下方福利领取平台，里面的所有福利按照操作正规去领，每个公民都可以去领相对应的福利<span class="sep"></span>点击活动过期记录，此处为公告，福利平台过期的平台，禁止参与的<span class="sep"></span></span>
+        <span class="mq-item">点击下方福利领取平台，里面的所有福利按照操作正规去领，每个公民都可以去领相对应的福利<span class="sep"></span>点击活动过期记录，此处为公告，福利平台过期的平台，禁止参与的<span class="sep"></span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 双按钮：默认选中「福利领取平台」 -->
+  <section class="actions">
+    <button class="btn on" id="btnClaim">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><path d="M5.5 12.5V20h13v-7.5"/><path d="M12 8.5V20"/><path d="M12 8.5C9 8.5 7.5 7 7.5 5.6 7.5 4.2 8.7 3.4 9.9 4c1.4.7 2.1 3 2.1 4.5zm0 0c3 0 4.5-1.5 4.5-2.9 0-1.4-1.2-2.2-2.4-1.6-1.4.7-2.1 3-2.1 4.5z"/></svg>
+      福利领取平台
+    </button>
+    <button class="btn" id="btnRule">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+      活动过期记录
+    </button>
+  </section>
+
+  <!-- 生态卡片：福利领取平台 -->
+  <section class="panel on" id="panelPlatform">
+    <div class="card"
+      data-num="1" data-name="全民福利生态"
+      data-start="2026/6/1" data-status="启动中" data-amount="38元" data-arrive="当天到账"
+      data-s1="全民福利生态是面向所有公民开放的基础福利通道，人人可参与。"
+      data-s2="只需按提示完成登记，即可领取平台发放的公益福利份额。"
+      data-s3="全程零费用、零投资，福利确认后当日即可到账。">
+      <div class="c-top"><span class="c-num">1</span><span class="c-name">全民福利生态</span><span class="c-view">点击查看</span></div>
+      <div class="c-desc">面向所有公民开放，按流程实名登记即可参与领取<br>每日定量发放，福利确认后即时到账</div>
+    </div>
+    <div class="card"
+      data-num="2" data-name="公益空投生态"
+      data-start="2026/7/10" data-status="启动中" data-amount="88元" data-arrive="三天到账"
+      data-s1="公益空投生态由平台公益金池出资，定期向公民免费空投福利。"
+      data-s2="参与者按流程操作即可领取，不收取任何手续费与押金。"
+      data-s3="严格执行禁止投资规则，凡涉及投资一律视为诈骗。">
+      <div class="c-top"><span class="c-num">2</span><span class="c-name">公益空投生态</span><span class="c-view">点击查看</span></div>
+      <div class="c-desc">平台公益补贴发放，全程不收取任何费用<br>按要求操作即可领，无需任何投资</div>
+    </div>
+    <div class="card"
+      data-num="3" data-name="免费领取生态"
+      data-start="2026/8/6" data-status="启动中" data-amount="168元" data-arrive="十天到账"
+      data-s1="免费领取生态提供多种福利项目，公民可按需选择领取。"
+      data-s2="每个公民限领对应份额，名额有限，先到先得。"
+      data-s3="福利仅在活动有效期内发放，逾期未领视为自动放弃。">
+      <div class="c-top"><span class="c-num">3</span><span class="c-name">免费领取生态</span><span class="c-view">点击查看</span></div>
+      <div class="c-desc">多种福利项目可选，每个公民限领相应份额<br>活动期间内有效，逾期未领视为放弃</div>
+    </div>
+  </section>
+
+  <!-- 生态卡片：活动过期记录 -->
+  <section class="panel" id="panelExpired">
+    <div class="card old"
+      data-num="1" data-name="过期领取生态"
+      data-start="2026/2/1" data-status="已结束" data-amount="（失效）" data-arrive="停止发放"
+      data-s1="过期领取生态已于2026年3月15日结束，领取通道已全部关闭。"
+      data-s2="该生态福利不再发放，未领取的份额视为自动放弃。"
+      data-s3="相关记录仅作公告留存，请勿再进行任何操作。">
+      <div class="c-top"><span class="c-num">1</span><span class="c-name">过期领取生态</span><span class="c-view">点击查看</span></div>
+      <div class="c-sub">2026年3月15日 已停止，活动结束</div>
+      <div class="c-desc">该活动已经结束，领取通道已全部关闭<br>到期未领取的份额视为自动放弃</div>
+    </div>
+    <div class="card old"
+      data-num="2" data-name="失效空投生态"
+      data-start="2026/3/20" data-status="已结束" data-amount="（失效）" data-arrive="停止发放"
+      data-s1="失效空投生态已于2026年5月20日停止发放全部福利。"
+      data-s2="平台不再受理该生态的任何领取申请与咨询。"
+      data-s3="相关记录仅作历史公告留存，谨防冒名诈骗。">
+      <div class="c-top"><span class="c-num">2</span><span class="c-name">失效空投生态</span><span class="c-view">点击查看</span></div>
+      <div class="c-sub">2026年5月20日 已停止，活动结束</div>
+      <div class="c-desc">该生态福利已停止发放，不再受理申请<br>历史记录仅作公告留存，请勿再操作</div>
+    </div>
+    <div class="card old"
+      data-num="3" data-name="关闭福利生态"
+      data-start="2026/5/5" data-status="已结束" data-amount="（失效）" data-arrive="停止发放"
+      data-s1="关闭福利生态所属平台已下架，活动全部终止。"
+      data-s2="禁止参与任何相关活动，谨防冒用名义的诈骗行为。"
+      data-s3="该记录仅作公告留存，切勿相信任何形式的投资。">
+      <div class="c-top"><span class="c-num">3</span><span class="c-name">关闭福利生态</span><span class="c-view">点击查看</span></div>
+      <div class="c-sub">2026年7月8日 已停止，活动结束</div>
+      <div class="c-desc">平台已下架，禁止参与任何相关活动<br>禁止投资，谨防冒名诈骗</div>
+    </div>
+  </section>
+
+</main>
+
+<!-- 卡片详情弹窗（占屏 80%） -->
+<div id="modal">
+  <div class="mask" data-close></div>
+  <div class="mbox" id="mbox">
+    <button class="m-close" data-close aria-label="关闭">×</button>
+    <div class="m-head"><span class="m-num" id="mNum">1</span><span class="m-name" id="mName"></span></div>
+    <div class="m-grid">
+      <div class="m-item"><span class="k">开始：</span><span class="v" id="mStart"></span></div>
+      <div class="m-item"><span class="k">活动：</span><span class="v" id="mStatus"></span></div>
+      <div class="m-item"><span class="k">可领取：</span><span class="v" id="mAmount"></span></div>
+      <div class="m-item"><span class="k">领取时间：</span><span class="v" id="mArrive"></span></div>
+    </div>
+    <div class="m-lines">
+      <p class="ln" id="mS1"></p>
+      <p class="ln" id="mS2"></p>
+      <p class="ln" id="mS3"></p>
+    </div>
+    <!-- 领取步骤流程（绿色竖线连接） -->
+    <div class="steps">
+      <div class="step"><span class="dot">1</span><div class="stxt">打开浏览器<em>用手机自带浏览器或常用浏览器打开本页面</em></div></div>
+      <div class="step"><span class="dot">2</span><div class="stxt">扫码登记<em>扫描页面二维码，按提示完成实名登记</em></div></div>
+      <div class="step"><span class="dot">3</span><div class="stxt">看视频做任务<em>按指引观看视频并完成对应任务</em></div></div>
+      <div class="step"><span class="dot">4</span><div class="stxt">领取到微信<em>福利确认后，款项直接到账微信零钱</em></div></div>
+    </div>
+    <!-- 操作按钮 -->
+    <div class="m-btns">
+      <button class="m-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M10.2 8.8l5.2 3.2-5.2 3.2z"/></svg>
+        操作视频观看
+      </button>
+      <button class="m-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/></svg>
+        下载链接
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 双按钮切换：选中项红色发光，另一项白色线条 ===== */
+(function(){
+  const btnClaim = document.getElementById('btnClaim');
+  const btnRule = document.getElementById('btnRule');
+  const panelPlatform = document.getElementById('panelPlatform');
+  const panelExpired = document.getElementById('panelExpired');
+
+  function select(tab){
+    const isPlatform = tab === 'platform';
+    btnClaim.classList.toggle('on', isPlatform);
+    btnRule.classList.toggle('on', !isPlatform);
+    panelPlatform.classList.toggle('on', isPlatform);
+    panelExpired.classList.toggle('on', !isPlatform);
+  }
+  btnClaim.addEventListener('click', () => select('platform'));
+  btnRule.addEventListener('click', () => select('expired'));
+  select('platform'); /* 默认选中福利领取平台 */
+})();
+
+/* ===== 卡片点击：弹出详情弹窗（占屏 80%） ===== */
+(function(){
+  const modal = document.getElementById('modal');
+  const mbox  = document.getElementById('mbox');
+  const $ = id => document.getElementById(id);
+
+  function open(card){
+    const d = card.dataset;
+    $('mNum').textContent    = d.num;
+    $('mName').textContent   = d.name;
+    $('mS1').textContent     = d.s1;
+    $('mS2').textContent     = d.s2;
+    $('mS3').textContent     = d.s3;
+    $('mStart').textContent  = d.start;
+    $('mStatus').textContent = d.status;
+    $('mAmount').textContent = d.amount;
+    $('mArrive').textContent = d.arrive;
+    mbox.classList.toggle('old', card.classList.contains('old'));
+    modal.classList.add('show');
+    mbox.scrollTop = 0;
+  }
+  function close(){ modal.classList.remove('show'); }
+
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => open(card));
+  });
+  modal.querySelectorAll('[data-close]').forEach(el => {
+    el.addEventListener('click', close);
+  });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') close(); });
+})();
+
+/* ===== 全局点击音效 + 特效（每个按钮音效不同） ===== */
+(function(){
+  let ctx = null;
+  function ac(){
+    if(!ctx){
+      const C = window.AudioContext || window.webkitAudioContext;
+      if(!C) return null;
+      ctx = new C();
+    }
+    if(ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+  /* 单音 / 滑音*/
+  function tone(f0, f1, dur, type, vol, delay){
+    const a = ac(); if(!a) return;
+    const t = a.currentTime + (delay || 0);
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(f0, t);
+    if(f1) o.frequency.exponentialRampToValueAtTime(Math.max(f1, 1), t + dur);
+    g.gain.setValueAtTime(.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + .012);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g); g.connect(a.destination);
+    o.start(t); o.stop(t + dur + .04);
+  }
+  /* 各按钮专属音效 */
+  const sound = {
+    claim(){ tone(520, 780, .16, 'triangle', .16); tone(780, 1040, .18, 'sine', .12, .11); },
+    rule(){  tone(840, 540, .18, 'triangle', .16); tone(540, 340, .20, 'sine', .11, .12); },
+    card(){  tone(680, 820, .10, 'square', .10); },
+    video(){ tone(520, 660, .10, 'sine', .14); tone(660, 880, .10, 'sine', .14, .09); tone(880, 1180, .16, 'sine', .12, .18); },
+    link(){  tone(720, 260, .26, 'sawtooth', .10); },
+    close(){ tone(320, 170, .13, 'sine', .10); },
+    horn(){  tone(880, 880, .12, 'square', .12); tone(660, 660, .12, 'square', .11, .13); tone(1040, 880, .16, 'square', .10, .26); }
+  };
+  /* 特效：水波扩散 + 亮度脉冲 */
+  function fx(el, e, withRipple){
+    el.classList.add('tapped');
+    setTimeout(() => el.classList.remove('tapped'), 420);
+    if(!withRipple) return;
+    const r = el.getBoundingClientRect();
+    const size = Math.max(r.width, r.height) * 1.3;
+    const s = document.createElement('span');
+    s.className = 'ripple';
+    s.style.width = s.style.height = size + 'px';
+    s.style.left = (e.clientX - r.left - size/2) + 'px';
+    s.style.top  = (e.clientY - r.top  - size/2) + 'px';
+    el.appendChild(s);
+    setTimeout(() => s.remove(), 580);
+  }
+
+  function bind(el, key, ripple){
+    if(!el) return;
+    el.addEventListener('click', e => { sound[key](); fx(el, e, ripple); });
+  }
+  bind(document.getElementById('btnClaim'), 'claim', true);
+  bind(document.getElementById('btnRule'),  'rule',  true);
+  document.querySelectorAll('.card').forEach(c => bind(c, 'card', true));
+
+  const mBtns = document.querySelectorAll('.m-btn');
+  bind(mBtns[0], 'video', true);
+  bind(mBtns[1], 'link',  true);
+  bind(document.querySelector('.m-close'), 'close', false);
+  bind(document.querySelector('.horn'),    'horn',  false);
+})();
+</script>
+</body>
+</html>
